@@ -63,7 +63,7 @@
   <ItemGroup>
     <Compile Include="AtmoVisualizer.cs" />
     <Compile Include="AttitudeController.cs" />
-    <Compile Include="Calculations.cs" />
+    <Compile Include="LaunchCalculations.cs" />
     <Compile Include="CelestialBodyExtensions.cs" />
     <Compile Include="FlightMap.cs" />
     <Compile Include="FuelFlowSimulation.cs" />
@@ -73,12 +73,14 @@
     <Compile Include="MathExtensions.cs" />
     <Compile Include="MechjebWrapper.cs" />
     <Compile Include="OrbitExtensions.cs" />
+    <Compile Include="LaunchParameters.cs" />
     <Compile Include="PartExtensions.cs" />
     <Compile Include="PIDController.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReleaseReloadableMonoBehaviour.cs" />
+    <Compile Include="SpeedupController.cs" />
     <Compile Include="StageController.cs" />
     <Compile Include="StageStats.cs" />
     <Compile Include="Utils.cs" />

@@ -19,7 +19,7 @@ namespace GravityTurn.Window
             base.WindowGUI(windowID);
             
             GUILayout.BeginVertical();
-            GUILayout.Label(turner.Message, GUILayout.Width(300), GUILayout.Height(200));
+            GUILayout.Label(LaunchCalculations.Instance.Message, GUILayout.Width(300), GUILayout.Height(200));
             GUILayout.EndVertical();
             if (GameSettings.MODIFIER_KEY.GetKeyDown() && !GravityTurner.DebugShow)
             {

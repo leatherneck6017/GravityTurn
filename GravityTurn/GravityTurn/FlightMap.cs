@@ -22,17 +22,18 @@ namespace GravityTurn
 
         public void UpdateMap(Vessel vessel)
         {
+            LaunchParameters parameters = GravityTurner.Parameters;
             double yScale;
             if (vessel.mainBody.atmosphere)
                 yScale = vessel.mainBody.atmosphereDepth;
             else
-                yScale = turner.DestinationHeight * 1000;
+                yScale = parameters.DestinationHeight * 1000;
             double MetersPerPixel = yScale / texture.height;
-            double x = turner.HorizontalDistance / MetersPerPixel % texture.width;
+            double x = LaunchCalculations.Instance.HorizontalDistance / MetersPerPixel % texture.width;
             double y = vessel.altitude / MetersPerPixel % texture.height;
             float red = (float)(vessel.CriticalHeatPart().CriticalHeat());
-            float green = (float)turner.vesselState.drag / 5;
-            float blue = (float)(turner.vesselState.thrustCurrent / turner.MaxThrust);
+            float green = (float)LaunchCalculations.Instance.vesselState.drag / 5;
+            float blue = (float)(LaunchCalculations.Instance.vesselState.thrustCurrent / LaunchCalculations.Instance.MaxThrust);
             texture.SetPixel((int)x, (int)y, new Color(red, green, blue));
             texture.Apply();
         }

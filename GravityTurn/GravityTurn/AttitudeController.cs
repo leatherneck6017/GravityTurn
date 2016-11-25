@@ -21,7 +21,7 @@ namespace GravityTurn
     public class AttitudeController
     {
         private static Vessel vessel { get { return FlightGlobals.ActiveVessel; } }
-        private VesselState vesselState { get { return turner.vesselState; } }
+        private VesselState vesselState { get { return LaunchCalculations.Instance.vesselState; } }
         public static Orbit orbit { get { return vessel.orbit; } }
         public PIDControllerV3 pid;
         public Vector3 lastAct = Vector3.zero;

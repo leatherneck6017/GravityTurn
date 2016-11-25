@@ -16,7 +16,7 @@ namespace GravityTurn
 
         GravityTurner turner = null;
         public static Vessel vessel { get { return FlightGlobals.ActiveVessel; } }
-        private VesselState vesselState { get { return turner.vesselState; } }
+        private VesselState vesselState { get { return LaunchCalculations.Instance.vesselState; } }
         //adjustable parameters:
 
         static public bool topFairingDeployed = false;
@@ -36,8 +36,8 @@ namespace GravityTurn
 
             //if autostage enabled, and if we are not waiting on the pad, and if there are stages left,
             //and if we are allowed to continue staging, and if we didn't just fire the previous stage
-            if (!vessel.LiftedOff() || StageManager.CurrentStage <= 0 || StageManager.CurrentStage <= turner.autostageLimit
-               || Math.Abs(vesselState.time - lastStageTime) < turner.autostagePostDelay)
+            if (!vessel.LiftedOff() || StageManager.CurrentStage <= 0 || StageManager.CurrentStage <= GravityTurner.Parameters.autostageLimit
+               || Math.Abs(vesselState.time - lastStageTime) < GravityTurner.Parameters.autostagePostDelay)
                 return;
 
             GravityTurner.DebugMessage += "  Lifted off\n";
@@ -49,12 +49,12 @@ namespace GravityTurn
                 if (fairing == null)
                     GravityTurner.DebugMessage += "  no top fairing\n";
                 
-                if (fairing != null && fairing.IsUnfiredDecoupler() && (vesselState.dynamicPressure < turner.FairingPressure && Math.Abs(vesselState.dynamicPressure - vesselState.maxQ) > 0.1) && (vesselState.maxQ > vessel.mainBody.atmospherePressureSeaLevel/2))
+                if (fairing != null && fairing.IsUnfiredDecoupler() && (vesselState.dynamicPressure < GravityTurner.Parameters.FairingPressure && Math.Abs(vesselState.dynamicPressure - vesselState.maxQ) > 0.1) && (vesselState.maxQ > vessel.mainBody.atmospherePressureSeaLevel/2))
                 {
                     topFairingDeployed = true;
                     fairing.DeployFairing();
                     GravityTurner.Log("Top Fairing deployed.");
-                    GravityTurner.Log("  fairing pressure: {0:0.0}", turner.FairingPressure);
+                    GravityTurner.Log("  fairing pressure: {0:0.0}", GravityTurner.Parameters.FairingPressure);
                     GravityTurner.Log("  dynamic pressure: {0:0.0}", vesselState.dynamicPressure);
                     GravityTurner.Log("  vessel maxQ: {0:0.0}", vesselState.maxQ);
                     GravityTurner.DebugMessage += "  Deploying top Fairing!!!\n";
@@ -87,7 +87,7 @@ namespace GravityTurn
             if (countingDown)
             {
                 GravityTurner.DebugMessage += "  Counting down\n";
-                if (Math.Abs(vesselState.time - stageCountdownStart) > turner.autostagePreDelay)
+                if (Math.Abs(vesselState.time - stageCountdownStart) > GravityTurner.Parameters.autostagePreDelay)
                 {
                     GravityTurner.DebugMessage += "    Countdown finished\n";
                     if (firesDecoupler)
@@ -99,14 +99,14 @@ namespace GravityTurn
                     GravityTurner.Log("Activate next stage.");
                     StageManager.ActivateNextStage();
                     countingDown = false;
-                    GravityTurner.RestoreTimeWarp();
+                    SpeedupController.RestoreTimeWarp();
                 }
             }
             else
             {
                 GravityTurner.DebugMessage += "  Stage Countdown\n";
-                GravityTurner.StoreTimeWarp();
-                GravityTurner.StopSpeedup();
+                SpeedupController.StoreTimeWarp();
+                SpeedupController.StopSpeedup();
                 stageCountdownStart = vesselState.time;
                 countingDown = true;
             }
@@ -295,7 +295,7 @@ namespace GravityTurn
         {
             foreach (Part p in v.parts.Slinq().OrderBy(o => o.inverseStage).ToList())
             {
-                if (p.inverseStage < turner.autostageLimit)
+                if (p.inverseStage < GravityTurner.Parameters.autostageLimit)
                     continue;
                 if (p.HasModule<ModuleProceduralFairing>() || (p.FindModulesImplementing<ModuleProceduralFairing>().Count > 0 && p.Modules.Contains("ProceduralFairingDecoupler")))
                     return p;

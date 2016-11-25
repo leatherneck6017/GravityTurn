@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace GravityTurn
 {
-    class DBEntry : IEquatable<DBEntry>, IComparable<DBEntry>
+    public class DBEntry : IEquatable<DBEntry>, IComparable<DBEntry>
     {
         [Persistent]
         public double StartSpeed;
@@ -66,9 +66,9 @@ namespace GravityTurn
             return other.StartSpeed == StartSpeed && other.TurnAngle == TurnAngle;
         }
 
-        public bool Equals(GravityTurner turner)
+        public bool Equals(LaunchParameters parameters, LaunchCalculations calculations)
         {
-            return StartSpeed == turner.StartSpeed && TurnAngle == turner.TurnAngle && MaxHeat == turner.MaxHeat && TotalLoss == turner.TotalLoss;
+            return StartSpeed == parameters.StartSpeed && TurnAngle == parameters.TurnAngle && MaxHeat == calculations.MaxHeat && TotalLoss == calculations.TotalLoss;
         }
 
         public override string ToString()
@@ -87,12 +87,14 @@ namespace GravityTurn
         }
     }
 
-    class LaunchDB
+    public class LaunchDB
     {
         GravityTurner turner;
         ConfigNode root = null;
         [Persistent]
         List<DBEntry> DB = new List<DBEntry>();
+
+
 
         public LaunchDB(GravityTurner inTurner)
         {
@@ -213,7 +215,7 @@ namespace GravityTurn
                 StartSpeed = DB[0].StartSpeed + DB[0].StartSpeed - DB[1].StartSpeed;
 
                 // check if this launch was already tried and failed
-                DBEntry check = FindEntry(StartSpeed, TurnAngle, turner.DestinationHeight);
+                DBEntry check = FindEntry(StartSpeed, TurnAngle, GravityTurner.Parameters.DestinationHeight);
                 if (check != null && !check.LaunchSuccess)
                 {
                     TurnAngle = (DB[0].TurnAngle + check.TurnAngle) / 2;
@@ -261,7 +263,7 @@ namespace GravityTurn
         ///</summary>
         DBEntry GetEntry()
         {
-            DBEntry foundEntry = FindEntry(turner.StartSpeed, turner.TurnAngle, turner.DestinationHeight);
+            DBEntry foundEntry = FindEntry(GravityTurner.Parameters.StartSpeed, GravityTurner.Parameters.TurnAngle, GravityTurner.Parameters.DestinationHeight);
             if (foundEntry != null)
                 return foundEntry;
             GravityTurner.Log("Recording new launch record #{0}", DB.Count);
@@ -289,14 +291,14 @@ namespace GravityTurn
         public void RecordLaunch()
         {
             DBEntry newentry = GetEntry();
-            newentry.TurnAngle = turner.TurnAngle;
-            newentry.StartSpeed = turner.StartSpeed;
+            newentry.TurnAngle = GravityTurner.Parameters.TurnAngle;
+            newentry.StartSpeed = GravityTurner.Parameters.StartSpeed;
             // avoid garbage loss values because of "revert flight"
-            if (newentry.TotalLoss < turner.TotalLoss)
-                newentry.TotalLoss = turner.TotalLoss;
-            if (newentry.MaxHeat < turner.MaxHeat)
-                newentry.MaxHeat = turner.MaxHeat;
-            newentry.DestinationHeight = turner.DestinationHeight;
+            if (newentry.TotalLoss < LaunchCalculations.Instance.TotalLoss)
+                newentry.TotalLoss = LaunchCalculations.Instance.TotalLoss;
+            if (newentry.MaxHeat < LaunchCalculations.Instance.MaxHeat)
+                newentry.MaxHeat = LaunchCalculations.Instance.MaxHeat;
+            newentry.DestinationHeight = GravityTurner.Parameters.DestinationHeight;
             if (!newentry.LaunchSuccess)
                 newentry.LaunchSuccess = GravityTurner.getVessel.orbit.ApA >= newentry.DestinationHeight * 1000;
         }

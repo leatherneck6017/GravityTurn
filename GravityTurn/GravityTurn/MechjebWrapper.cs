@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace GravityTurn
 {
-    class MechjebWrapper
+    public class MechjebWrapper
     {
         System.Type CoreType;
 

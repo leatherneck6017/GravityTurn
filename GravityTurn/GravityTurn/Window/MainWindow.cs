@@ -10,11 +10,13 @@ namespace GravityTurn.Window
 
         HelpWindow helpWindow = null;
         StageSettings stagesettings = null;
+        LaunchParameters parameters = null;
 
         public MainWindow(GravityTurner inTurner, int inWindowID)
             : base(inTurner,inWindowID)
         {
             turner = inTurner;
+            parameters = GravityTurner.Parameters;
             helpWindow = new HelpWindow(inTurner,inWindowID+1);
             stagesettings = new StageSettings(inTurner, inWindowID + 2, helpWindow);
             windowPos.width = 300;
@@ -27,8 +29,8 @@ namespace GravityTurn.Window
         {
             GUILayout.BeginHorizontal();
             ItemLabel("Start m/s");
-            turner.StartSpeed.setValue(GUILayout.TextField(string.Format("{0:0.0}", turner.StartSpeed), GUILayout.Width(60)));
-            turner.StartSpeed.locked = GuiUtils.LockToggle(turner.StartSpeed.locked);
+            parameters.StartSpeed.setValue(GUILayout.TextField(string.Format("{0:0.0}", parameters.StartSpeed), GUILayout.Width(60)));
+            parameters.StartSpeed.locked = GuiUtils.LockToggle(parameters.StartSpeed.locked);
             helpWindow.Button("At this speed, pitch to Turn Angle to begin the gravity turn.  Stronger rockets and extremely aerodynamically stable rockets should do this earlier.");
             GUILayout.EndHorizontal();
 
@@ -37,8 +39,8 @@ namespace GravityTurn.Window
         {
             GUILayout.BeginHorizontal();
             ItemLabel("Turn Angle");
-            turner.TurnAngle.setValue(GUILayout.TextField(string.Format("{0:0.0}", turner.TurnAngle), GUILayout.Width(60)));
-            turner.TurnAngle.locked = GuiUtils.LockToggle(turner.TurnAngle.locked);
+            parameters.TurnAngle.setValue(GUILayout.TextField(string.Format("{0:0.0}", parameters.TurnAngle), GUILayout.Width(60)));
+            parameters.TurnAngle.locked = GuiUtils.LockToggle(parameters.TurnAngle.locked);
             helpWindow.Button("Angle to start turn at Start Speed.  Higher values may cause aerodynamic stress.");
             GUILayout.EndHorizontal();
         }
@@ -46,8 +48,8 @@ namespace GravityTurn.Window
         {
             GUILayout.BeginHorizontal();
             ItemLabel("Hold AP Time Start");
-            turner.APTimeStart.setValue(GUILayout.TextField(turner.APTimeStart.ToString(), GUILayout.Width(60)));
-            turner.APTimeStart.locked = GuiUtils.LockToggle(turner.APTimeStart.locked);
+            parameters.APTimeStart.setValue(GUILayout.TextField(parameters.APTimeStart.ToString(), GUILayout.Width(60)));
+            parameters.APTimeStart.locked = GuiUtils.LockToggle(parameters.APTimeStart.locked);
             helpWindow.Button("Starting value for Time To Prograde.  Higher values will make a steeper climb.  Steeper climbs are usually worse.  Lower values may cause overheating or death.");
             GUILayout.EndHorizontal();
         }
@@ -55,8 +57,8 @@ namespace GravityTurn.Window
         {
             GUILayout.BeginHorizontal();
             ItemLabel("Hold AP Time Finish");
-            turner.APTimeFinish.setValue(GUILayout.TextField(turner.APTimeFinish.ToString(), GUILayout.Width(60)));
-            turner.APTimeFinish.locked = GuiUtils.LockToggle(turner.APTimeFinish.locked);
+            parameters.APTimeFinish.setValue(GUILayout.TextField(parameters.APTimeFinish.ToString(), GUILayout.Width(60)));
+            parameters.APTimeFinish.locked = GuiUtils.LockToggle(parameters.APTimeFinish.locked);
             helpWindow.Button("AP Time will fade to this value, to vary the steepness of the ascent during the ascent.");
             GUILayout.EndHorizontal();
         }
@@ -64,8 +66,8 @@ namespace GravityTurn.Window
         {
             GUILayout.BeginHorizontal();
             ItemLabel("Sensitivity");
-            turner.Sensitivity.setValue(GUILayout.TextField(turner.Sensitivity.ToString(), GUILayout.Width(60)));
-            turner.Sensitivity.locked = GuiUtils.LockToggle(turner.Sensitivity.locked);
+            parameters.Sensitivity.setValue(GUILayout.TextField(parameters.Sensitivity.ToString(), GUILayout.Width(60)));
+            parameters.Sensitivity.locked = GuiUtils.LockToggle(parameters.Sensitivity.locked);
             helpWindow.Button("Will not throttle below this value.  Mostly a factor at the end of ascent.");
             GUILayout.EndHorizontal();
         }
@@ -73,8 +75,8 @@ namespace GravityTurn.Window
         {
             GUILayout.BeginHorizontal();
             ItemLabel("Destination Height (km)");
-            turner.DestinationHeight.setValue(GUILayout.TextField(turner.DestinationHeight.ToString(), GUILayout.Width(60)));
-            turner.DestinationHeight.locked = GuiUtils.LockToggle(turner.DestinationHeight.locked);
+            parameters.DestinationHeight.setValue(GUILayout.TextField(parameters.DestinationHeight.ToString(), GUILayout.Width(60)));
+            parameters.DestinationHeight.locked = GuiUtils.LockToggle(parameters.DestinationHeight.locked);
             helpWindow.Button("Desired Apoapsis.");
             GUILayout.EndHorizontal();
         }
@@ -82,8 +84,8 @@ namespace GravityTurn.Window
         {
             GUILayout.BeginHorizontal();
             ItemLabel("Roll");
-            turner.Roll.setValue(GUILayout.TextField(turner.Roll.ToString(), GUILayout.Width(60)));
-            turner.Roll.locked = GuiUtils.LockToggle(turner.Roll.locked);
+            parameters.Roll.setValue(GUILayout.TextField(parameters.Roll.ToString(), GUILayout.Width(60)));
+            parameters.Roll.locked = GuiUtils.LockToggle(parameters.Roll.locked);
             helpWindow.Button("If you want a particular side of your ship to face downwards.  Shouldn't matter for most ships.  May cause mild nausea.");
             GUILayout.EndHorizontal();
         }
@@ -91,8 +93,8 @@ namespace GravityTurn.Window
         {
             GUILayout.BeginHorizontal();
             ItemLabel("Inclination");
-            turner.Inclination.setValue(GUILayout.TextField(turner.Inclination.ToString(), GUILayout.Width(60)));
-            turner.Inclination.locked = GuiUtils.LockToggle(turner.Inclination.locked);
+            parameters.Inclination.setValue(GUILayout.TextField(parameters.Inclination.ToString(), GUILayout.Width(60)));
+            parameters.Inclination.locked = GuiUtils.LockToggle(parameters.Inclination.locked);
             helpWindow.Button("Desired orbit inclination.  Any non-zero value WILL make your launch less efficient. Final inclination will also not be perfect.  Sorry about that, predicting coriolis is hard.");
             GUILayout.EndHorizontal();
         }
@@ -100,29 +102,29 @@ namespace GravityTurn.Window
         {
             GUILayout.BeginHorizontal();
             ItemLabel("Pressure Cutoff");
-            turner.PressureCutoff.setValue(GUILayout.TextField(turner.PressureCutoff.ToString(), GUILayout.Width(60)));
-            turner.PressureCutoff.locked = GuiUtils.LockToggle(turner.PressureCutoff.locked);
+            parameters.PressureCutoff.setValue(GUILayout.TextField(parameters.PressureCutoff.ToString(), GUILayout.Width(60)));
+            parameters.PressureCutoff.locked = GuiUtils.LockToggle(parameters.PressureCutoff.locked);
             helpWindow.Button("Dynamic pressure where we change from Surface to Orbital velocity tracking\nThis will be a balance point between aerodynamic drag in the upper atmosphere vs. thrust vector loss.");
             GUILayout.EndHorizontal();
         }
 
-        private string GetAscentPhaseString(GravityTurner.AscentProgram program)
+        private string GetAscentPhaseString(LaunchCalculations.AscentPhase phase)
         {
-            switch (program)
+            switch (phase)
             {
-                case GravityTurner.AscentProgram.Landed:
+                case LaunchCalculations.AscentPhase.Landed:
                     return "Landed";
-                case GravityTurner.AscentProgram.InLaunch:
+                case LaunchCalculations.AscentPhase.InLaunch:
                     return "Launching";
-                case GravityTurner.AscentProgram.InInitialPitch:
+                case LaunchCalculations.AscentPhase.InInitialPitch:
                     return "Pitching";
-                case GravityTurner.AscentProgram.InTurn:
+                case LaunchCalculations.AscentPhase.InTurn:
                     return "Turning";
-                case GravityTurner.AscentProgram.InInsertion:
+                case LaunchCalculations.AscentPhase.InInsertion:
                     return "Insertion";
-                case GravityTurner.AscentProgram.InCoasting:
+                case LaunchCalculations.AscentPhase.InCoasting:
                     return "Coasting";
-                case GravityTurner.AscentProgram.InCircularisation:
+                case LaunchCalculations.AscentPhase.InCircularisation:
                     return "";
             }
             return "";
@@ -134,7 +136,7 @@ namespace GravityTurn.Window
             if (!WindowVisible && turner.button.enabled)
             {
                 turner.button.SetFalse(false);
-                turner.SaveParameters();
+                parameters.Save();
             }
             GUILayout.BeginVertical();
             UiStartSpeed();
@@ -149,15 +151,15 @@ namespace GravityTurn.Window
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Setup", GUILayout.ExpandWidth(false)))
                 stagesettings.WindowVisible = !stagesettings.WindowVisible;
-            turner.EnableStageManager = GUILayout.Toggle(turner.EnableStageManager, "Auto Stage");
-            turner.EnableSpeedup = GUILayout.Toggle(turner.EnableSpeedup, "Use Timewarp");
+            parameters.EnableStageManager = GUILayout.Toggle(parameters.EnableStageManager, "Auto Stage");
+            parameters.EnableSpeedup = GUILayout.Toggle(parameters.EnableSpeedup, "Use Timewarp");
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             turner.flightMapWindow.WindowVisible = GUILayout.Toggle(turner.flightMapWindow.WindowVisible, "Show Launch Map", GUILayout.ExpandWidth(false));
-            turner.EnableStats = GUILayout.Toggle(turner.EnableStats, "Show Stats", GUILayout.ExpandWidth(false));
-            if (turner.statsWindow.WindowVisible != turner.EnableStats)
+            parameters.EnableStats = GUILayout.Toggle(parameters.EnableStats, "Show Stats", GUILayout.ExpandWidth(false));
+            if (turner.statsWindow.WindowVisible != parameters.EnableStats)
             {
-                turner.statsWindow.WindowVisible = turner.EnableStats;
+                turner.statsWindow.WindowVisible = parameters.EnableStats;
                 turner.statsWindow.Save();
                 if (!turner.statsWindow.WindowVisible)
                 {
@@ -168,39 +170,39 @@ namespace GravityTurn.Window
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             // when not landed and not launching we are in orbit. allow to save.
-            if (!GravityTurner.getVessel.Landed && !turner.Launching)
+            if (!GravityTurner.getVessel.Landed && !LaunchCalculations.Instance.Launching)
             {
-                if (turner.program >= GravityTurner.AscentProgram.InCircularisation)
+                if (LaunchCalculations.Instance.Phase >= LaunchCalculations.AscentPhase.InCircularisation)
                     GUILayout.Label("Launch success! ", GUILayout.ExpandWidth(false));
 
                 if (GUILayout.Button(GuiUtils.saveIcon, GUILayout.ExpandWidth(false), GUILayout.MinWidth(18), GUILayout.MinHeight(21)))
-                    turner.SaveDefaultParameters();
+                    parameters.SaveDefaults();
             }
             else
-                GUILayout.Label(string.Format("{0}, time to match: {1:0.0} s", GetAscentPhaseString(turner.program), turner.HoldAPTime), GUILayout.ExpandWidth(false));
+                GUILayout.Label(string.Format("{0}, time to match: {1:0.0} s", GetAscentPhaseString(LaunchCalculations.Instance.Phase), parameters.HoldAPTime), GUILayout.ExpandWidth(false));
             GUILayout.EndHorizontal();
 
             // landed, not launched yet. Allow configuration
-            if (GravityTurner.getVessel.Landed && !turner.Launching)
+            if (GravityTurner.getVessel.Landed && !LaunchCalculations.Instance.Launching)
             {
                 GUILayout.BeginHorizontal();
                 string guess = turner.IsLaunchDBEmpty() ? "First Guess" : "Improve Guess";
                 if (GUILayout.Button(guess, GUILayout.ExpandWidth(false)))
-                    turner.CalculateSettings(GravityTurner.getVessel);
+                    LaunchCalculations.Instance.CalculateSettings(GravityTurner.getVessel);
                 if (GUILayout.Button("Previous Best Settings", GUILayout.ExpandWidth(false)))
-                    turner.CalculateSettings(GravityTurner.getVessel, true);
+                    LaunchCalculations.Instance.CalculateSettings(GravityTurner.getVessel, true);
                 helpWindow.Button("Improve Guess will try to extrapolate the best settings based on previous launches.  This may end in fiery death, but it won't happen the same way twice.  Be warned, sometimes launches get worse before they get better.  But they do get better.");
                 if (GUILayout.Button(GuiUtils.saveIcon, GUILayout.ExpandWidth(false), GUILayout.MinWidth(18), GUILayout.MinHeight(21)))
-                    turner.SaveDefaultParameters();
+                    parameters.SaveDefaults();
                 GUILayout.EndHorizontal();
             }
             // while landed, show launch button
-            if (GravityTurner.getVessel.Landed && !turner.Launching && GUILayout.Button("Launch!", GUILayout.ExpandWidth(true), GUILayout.MinHeight(30)))
+            if (GravityTurner.getVessel.Landed && !LaunchCalculations.Instance.Launching && GUILayout.Button("Launch!", GUILayout.ExpandWidth(true), GUILayout.MinHeight(30)))
             {
                 turner.Launch();
             }
             // while launching, show launch button
-            if (turner.Launching && GUILayout.Button("Abort!", GUILayout.MinHeight(30)))
+            if (LaunchCalculations.Instance.Launching && GUILayout.Button("Abort!", GUILayout.MinHeight(30)))
             {
                 turner.Kill();
                 turner.RecordAbortedLaunch();
@@ -212,12 +214,12 @@ namespace GravityTurn.Window
             GUILayout.EndVertical();
             double StopHeight = GravityTurner.getVessel.mainBody.atmosphereDepth;
             if (StopHeight <= 0)
-                StopHeight = turner.DestinationHeight * 1000;
-            turner.HoldAPTime = turner.APTimeStart + ((float)GravityTurner.getVessel.altitude / (float)StopHeight * (turner.APTimeFinish - turner.APTimeStart));
-            if (turner.HoldAPTime > Math.Max(turner.APTimeFinish, turner.APTimeStart))
-                turner.HoldAPTime = Math.Max(turner.APTimeFinish, turner.APTimeStart);
-            if (turner.HoldAPTime < Math.Min(turner.APTimeFinish, turner.APTimeStart))
-                turner.HoldAPTime = Math.Min(turner.APTimeFinish, turner.APTimeStart);
+                StopHeight = parameters.DestinationHeight * 1000;
+            parameters.HoldAPTime = parameters.APTimeStart + ((float)GravityTurner.getVessel.altitude / (float)StopHeight * (parameters.APTimeFinish - parameters.APTimeStart));
+            if (parameters.HoldAPTime > Math.Max(parameters.APTimeFinish, parameters.APTimeStart))
+                parameters.HoldAPTime = Math.Max(parameters.APTimeFinish, parameters.APTimeStart);
+            if (parameters.HoldAPTime < Math.Min(parameters.APTimeFinish, parameters.APTimeStart))
+                parameters.HoldAPTime = Math.Min(parameters.APTimeFinish, parameters.APTimeStart);
             Rect r = GUILayoutUtility.GetLastRect();
             float minHeight = r.height + r.yMin + 10;
             if (windowPos.height != minHeight && minHeight>20)
