@@ -363,27 +363,30 @@ namespace GravityTurn
             // AndyMt: this code is from MechJeb as far as I can tell. 
             // Check there how SAS works as soon as it's ported to 1.2. 
             // Until then we don't use SAS which seems to be the default anyway.
-/*            if (useSAS)
+            if (useSAS)
             {
+                // TODO : This most likely require some love to use all the new SAS magic
+
                 _requestedAttitude = attitudeGetReferenceRotation(attitudeReference) * attitudeTarget * Quaternion.Euler(90, 0, 0);
                 if (!vessel.ActionGroups[KSPActionGroup.SAS])
                 {
                     vessel.ActionGroups.SetGroup(KSPActionGroup.SAS, true);
-                    vessel.Autopilot.SAS.LockHeading(_requestedAttitude);
+                    vessel.Autopilot.SAS.SetTargetOrientation(_requestedAttitude * Vector3.up, false);
                     lastSAS = _requestedAttitude;
                 }
                 else if (Quaternion.Angle(lastSAS, _requestedAttitude) > 10)
                 {
-                    vessel.Autopilot.SAS.LockHeading(_requestedAttitude);
+                    vessel.Autopilot.SAS.SetTargetOrientation(_requestedAttitude * Vector3.up, false);
                     lastSAS = _requestedAttitude;
                 }
                 else
                 {
-                    vessel.Autopilot.SAS.LockHeading(_requestedAttitude, true);
+                    vessel.Autopilot.SAS.SetTargetOrientation(_requestedAttitude * Vector3.up, true);
                 }
 
+                //core.thrust.differentialThrottleDemandedTorque = Vector3d.zero;
             }
-            else*/
+            else
             {
                 // Direction we want to be facing
                 _requestedAttitude = attitudeGetReferenceRotation(attitudeReference) * attitudeTarget;

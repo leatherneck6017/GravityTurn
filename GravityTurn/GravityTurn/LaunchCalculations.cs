@@ -9,13 +9,13 @@ namespace GravityTurn
     {
         public enum AscentPhase
         {
-            Landed,
-            InLaunch,
-            InTurn,
-            InInitialPitch,
-            InInsertion,
-            InCoasting,
-            InCircularisation
+            Landed = 0,
+            InLaunch = 1,
+            InInitialPitch = 2,
+            InTurn = 3,
+            InInsertion = 4,
+            InCoasting = 5,
+            InCircularisation = 6
         }
         public bool Launching = false;
         public AscentPhase Phase = AscentPhase.Landed;
@@ -33,7 +33,7 @@ namespace GravityTurn
         public LaunchParameters Parameters;
         public StageStats stagestats = null;
         public string Message = "";
-
+        public bool isRSS = false;
 
         #region Loss and related variables
 
@@ -70,13 +70,15 @@ namespace GravityTurn
 
         public void InitializeNumbers(Vessel vessel)
         {
+            FlyTimeInterval = Time.time;
             NeutralThrottle = 0.5f;
             PrevTime = 0;
             VelocityLost = 0;
             DragLoss = 0;
             GravityDragLoss = 0;
-            FlyTimeInterval = Time.time;
             VectorLoss = 0;
+            TotalBurn = 0;
+            TotalLoss = 0;
             HorizontalDistance = 0;
             inclinationHeadingCorrectionSpeed = LaunchCalculations.CircularOrbitSpeed(vessel.mainBody, vessel.mainBody.Radius + Parameters.DestinationHeight * 1000);
             GravityTurner.Log("Orbit velocity {0:0.0}", inclinationHeadingCorrectionSpeed);
@@ -151,6 +153,8 @@ namespace GravityTurn
                 {
                     if (PitchAdjustment > 0)
                         PitchAdjustment.value -= 0.1f;
+                    else if (isRSS)
+                        PitchAdjustment.value -= 0.1f;
                     else
                         Throttle.value -= diff;
                 }
@@ -163,14 +167,25 @@ namespace GravityTurn
                 GravityTurner.DebugMessage += String.Format("-\n");
 
             }
-            if (PitchAdjustment < 0)
-                PitchAdjustment.value = 0;
+            if (PitchAdjustment < 0 && (timeToAP < Parameters.HoldAPTime || !isRSS ))
+            {
+                PitchAdjustment.force(0);
+            }
+
+            if (PitchAdjustment < -Math.Min(MaxAngle(vessel, vesselState), 10) && isRSS)
+                PitchAdjustment.value = -Math.Min(MaxAngle(vessel, vesselState), 10);
             if (PitchAdjustment > MaxAngle(vessel, vesselState))
                 PitchAdjustment.value = MaxAngle(vessel, vesselState);
+            float progradePitch = vessel.ProgradePitch(Phase < AscentPhase.InInsertion);
+            if (vesselState.vesselPitch < 0 && isRSS)
+                PitchAdjustment.force(progradePitch + 0.1);
 
             // We don't want to do any pitch correction during the initial lift
             if (vessel.ProgradePitch(true) < -45)
                 PitchAdjustment.force(0);
+            GravityTurner.DebugMessage += String.Format("  PitchAdjustment: {0:0.0}\n", PitchAdjustment.value);
+            GravityTurner.DebugMessage += String.Format("  vesselState.vesselPitch: {0:0.0}\n", vesselState.vesselPitch.value);
+            GravityTurner.DebugMessage += String.Format("  vessel.MaxAngle: {0:0.0}\n", MaxAngle(vessel, vesselState));
 
             PrevTime = vessel.orbit.timeToAp;
             lastTimeMeasured = Time.time;
@@ -225,7 +240,7 @@ namespace GravityTurn
                 GravityTurner.launchdb.Save();
                 Phase = AscentPhase.InCoasting;
                 Throttle.force(0);
-                GravityTurner.Log("minorbit {0}, {1}", vessel.mainBody.minOrbitalDistance, vessel.StableOrbitHeight());
+                GravityTurner.Log("minorbit {0:0.00}, {1:0.00}", vessel.mainBody.minOrbitalDistance, vessel.StableOrbitHeight());
                 // time warp to speed up things (if enabled)
                 SpeedupController.ApplySpeedup(2);
             }
@@ -272,7 +287,7 @@ namespace GravityTurn
                     if (vesselState.altitudeBottom > vesselState.vesselHeight)
                         GravityTurner.attitude.attitudeTo(Quaternion.Euler(-90, LaunchHeading(vessel), 0) * RollRotation(), AttitudeReference.SURFACE_NORTH, this);
                     else
-                        GravityTurner.attitude.attitudeTo(Quaternion.Euler(-90, 0, 0), AttitudeReference.SURFACE_NORTH, this);
+                        GravityTurner.attitude.attitudeTo(Quaternion.Euler(-90, 0, vesselState.vesselHeading), AttitudeReference.SURFACE_NORTH, this);
                 }
                 else if (Phase == AscentPhase.InLaunch || Phase == AscentPhase.InInitialPitch)
                 {
