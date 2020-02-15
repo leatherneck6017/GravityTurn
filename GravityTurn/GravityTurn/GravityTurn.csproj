@@ -43,7 +43,7 @@
       <HintPath>$(KSP_Dir)/KSP_Data/Managed/Assembly-CSharp-firstpass.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Condition="'$(Configuration)' == 'Debug'" Include="KramaxReloadExtensions">
+    <Reference Include="KramaxReloadExtensions">
       <HintPath>..\..\..\..\Desktop\KramaxPluginReload-master\bin\Release\KramaxReloadExtensions.dll</HintPath>
       <Private>False</Private>
     </Reference>
