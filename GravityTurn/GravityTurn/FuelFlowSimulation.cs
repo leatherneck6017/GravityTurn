@@ -331,7 +331,7 @@ namespace GravityTurn
 
         private float VesselThrust(float throttle, double staticPressure, double atmDensity, double machNumber)
         {
-            var param = new Tuple<float, double, double, double>(throttle, staticPressure, atmDensity, machNumber);
+            var param = new Smooth.Algebraics.Tuple<float, double, double, double>(throttle, staticPressure, atmDensity, machNumber);
 
             using (var activeEngines = FindActiveEngines())
             {
@@ -343,7 +343,7 @@ namespace GravityTurn
         //Returns a list of engines that fire during the current simulated stage.
         private Disposable<List<FuelNode>> FindActiveEngines()
         {
-            var param = new Tuple<int, List<FuelNode>>(simStage, nodes);
+            var param = new Smooth.Algebraics.Tuple<int, List<FuelNode>>(simStage, nodes);
             var activeEngines = ListPool<FuelNode>.Instance.BorrowDisposable();
             //print("Finding active engines: excluding resource considerations, there are " + nodes.Count(n => n.isEngine && n.inverseStage >= simStage));
             nodes.Slinq().Where((n, p) => n.isEngine && n.inverseStage >= p.Item1 && n.CanDrawNeededResources(p.Item2), param).AddTo(activeEngines.value);
@@ -617,7 +617,7 @@ namespace GravityTurn
                     propellantSumRatioTimesDensity = engine.propellants.Slinq().Where(prop => !prop.ignoreForIsp).Select(prop => prop.ratio * MuUtils.ResourceDensity(prop.id)).Sum();
                     propellantRatios.Clear();
                     propellantFlows.Clear();
-                    var dics = new Tuple<KeyableDictionary<int, float>, KeyableDictionary<int, ResourceFlowMode>>(propellantRatios, propellantFlows);
+                    var dics = new Smooth.Algebraics.Tuple<KeyableDictionary<int, float>, KeyableDictionary<int, ResourceFlowMode>>(propellantRatios, propellantFlows);
                     engine.propellants.Slinq()
                         .Where(prop => MuUtils.ResourceDensity(prop.id) > 0 && !prop.ignoreForIsp)
                         .ForEach((p, dic) =>
@@ -973,7 +973,7 @@ namespace GravityTurn
 
         public float MaxTimeStep()
         {
-            var param = new Tuple<DefaultableDictionary<int, float>, float, DefaultableDictionary<int, float>>(resources, DRAINED, resourceDrains);
+            var param = new Smooth.Algebraics.Tuple<DefaultableDictionary<int, float>, float, DefaultableDictionary<int, float>>(resources, DRAINED, resourceDrains);
             if (!resourceDrains.KeysList.Slinq().Any((id, p) => p.Item1[id] > p.Item2, param)) return float.MaxValue;
             return resourceDrains.KeysList.Slinq().Where((id, p) => p.Item1[id] > p.Item2, param).Select((id, p) => p.Item1[id] / p.Item3[id], param).Min();
         }

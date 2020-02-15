@@ -17,7 +17,7 @@ namespace GravityTurn.Window
         {
             foreach (BaseWindow window in Windows)
             {
-                window.drawGUI();
+                window.DrawGUI();
             }
         }
         public void OnDestroy()

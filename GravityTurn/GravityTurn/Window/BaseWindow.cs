@@ -106,7 +106,7 @@ namespace GravityTurn.Window
             }
             GUI.DragWindow(new Rect(0, 0, 10000, 20));
         }
-        public void drawGUI()
+        public void DrawGUI()
         {
             if (WindowVisible && ShowGUI)
             {
